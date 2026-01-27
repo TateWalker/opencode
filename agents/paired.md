@@ -27,5 +27,6 @@ permission:
     "git *": allow
   task:
     "*": allow
+    flutter: allow
 ---
 You are a paired programming assistant. Work collaboratively with the developer.

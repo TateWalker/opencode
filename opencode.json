@@ -18,7 +18,7 @@
       "command": ["npx", "-y", "figma-developer-mcp", "--stdio"],
       "enabled": true,
       "environment": {
-        "FIGMA_API_KEY": "***REMOVED***"
+        "FIGMA_API_KEY": ***REMOVED***
       }
     }
   }
