@@ -23,8 +23,12 @@ permission:
     "*": allow
   bash:
     "*": ask
+    "ls *": allow
+    "ls": allow
+    "cat *": allow
+    "cat": allow
     "rm *": ask
-    "git *": allow
+    "git *": ask
   task:
     "*": allow
     flutter: allow

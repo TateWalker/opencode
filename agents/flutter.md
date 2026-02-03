@@ -1,6 +1,8 @@
 ---
 description: Flutter and Dart specialist with Figma integration for mobile/web UI implementation
 mode: subagent
+tools:
+  figma: true
 permission:
   "*": allow
   external_directory: allow

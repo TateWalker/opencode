@@ -2,6 +2,8 @@
 description: Primary build agent with full permissions
 mode: primary
 color: "#DC2626"
+tools:
+  figma: true
 permission:
   "*": allow
   task:
