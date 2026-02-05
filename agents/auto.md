@@ -7,7 +7,7 @@ tools:
 permission:
   "*": allow
   task:
-    frontend: allow
+    flutter: allow
 ---
 
 You are the primary build agent with full tool access for development work.
