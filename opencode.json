@@ -1,11 +1,11 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "model": "github-copilot/claude-sonnet-4.6",
+  "model": "github-copilot/claude-sonnet-5",
   "small_model": "github-copilot/claude-haiku-4.5",
   "provider": {
     "github-copilot": {
       "models": {
-        "claude-sonnet-4.6": {
+        "claude-sonnet-5": {
           "options": {
             "reasoningEffort": "low"
           }
@@ -17,27 +17,18 @@
   "instructions": [
     "AGENTS.md",
     "CONTRIBUTING.md",
-    "instructions/INSTRUCTIONS.md",
-    "skills/tdd-workflow/SKILL.md",
-    "skills/security-review/SKILL.md",
-    "skills/coding-standards/SKILL.md",
-    "skills/frontend-patterns/SKILL.md",
-    "skills/frontend-slides/SKILL.md",
-    "skills/backend-patterns/SKILL.md",
-    "skills/e2e-testing/SKILL.md",
-    "skills/verification-loop/SKILL.md",
-    "skills/api-design/SKILL.md",
-    "skills/strategic-compact/SKILL.md",
-    "skills/eval-harness/SKILL.md"
+    "instructions/openspec-superpowers.md"
   ],
   "plugin": [
-    "./plugins"
+    "./plugins",
+    "./plugins/caveman/plugin.js",
+    "superpowers@git+https://github.com/obra/superpowers.git"
   ],
   "agent": {
     "build": {
       "description": "Primary coding agent for development work",
       "mode": "primary",
-      "model": "github-copilot/claude-sonnet-4.6",
+      "model": "github-copilot/claude-sonnet-5",
       "tools": {
         "write": true,
         "edit": true,
@@ -46,28 +37,17 @@
         "changed-files": true
       }
     },
-    "planner": {
-      "description": "Expert planning specialist for complex features and refactoring. Use for implementation planning, architectural changes, or complex refactoring.",
-      "mode": "subagent",
-      "model": "github-copilot/claude-opus-4.8",
-      "prompt": "{file:prompts/agents/planner.txt}",
-      "tools": {
-        "read": true,
-        "bash": true,
-        "write": false,
-        "edit": false
-      }
-    },
-    "architect": {
-      "description": "Software architecture specialist for system design, scalability, and technical decision-making.",
-      "mode": "subagent",
-      "model": "github-copilot/claude-opus-4.8",
-      "prompt": "{file:prompts/agents/architect.txt}",
-      "tools": {
-        "read": true,
-        "bash": true,
-        "write": false,
-        "edit": false
+    "plan": {
+      "permission": {
+        "edit": "deny",
+        "bash": {
+          "*": "allow",
+          "cargo fmt*": "deny",
+          "git commit*": "deny",
+          "git push*": "deny",
+          "git add*": "deny",
+          "rm *": "deny"
+        }
       }
     },
     "code-reviewer": {
@@ -94,18 +74,6 @@
         "edit": true
       }
     },
-    "tdd-guide": {
-      "description": "Test-Driven Development specialist enforcing write-tests-first methodology. Use when writing new features, fixing bugs, or refactoring code. Ensures 80%+ test coverage.",
-      "mode": "subagent",
-      "model": "github-copilot/claude-opus-4.8",
-      "prompt": "{file:prompts/agents/tdd-guide.txt}",
-      "tools": {
-        "read": true,
-        "write": true,
-        "edit": true,
-        "bash": true
-      }
-    },
     "build-error-resolver": {
       "description": "Build and TypeScript error resolution specialist. Use when build fails or type errors occur. Fixes build/type errors only with minimal diffs.",
       "mode": "subagent",
@@ -123,18 +91,6 @@
       "mode": "subagent",
       "model": "github-copilot/claude-opus-4.8",
       "prompt": "{file:prompts/agents/e2e-runner.txt}",
-      "tools": {
-        "read": true,
-        "write": true,
-        "edit": true,
-        "bash": true
-      }
-    },
-    "doc-updater": {
-      "description": "Documentation and codemap specialist. Use for updating codemaps and documentation.",
-      "mode": "subagent",
-      "model": "github-copilot/claude-opus-4.8",
-      "prompt": "{file:prompts/agents/doc-updater.txt}",
       "tools": {
         "read": true,
         "write": true,
@@ -214,29 +170,6 @@
         "bash": true
       }
     },
-    "docs-lookup": {
-      "description": "Documentation specialist using Context7 MCP to fetch current library and API documentation with code examples.",
-      "mode": "subagent",
-      "model": "github-copilot/claude-sonnet-4.6",
-      "prompt": "{file:prompts/agents/docs-lookup.txt}",
-      "tools": {
-        "read": true,
-        "bash": true,
-        "write": false,
-        "edit": false
-      }
-    },
-    "harness-optimizer": {
-      "description": "Analyze and improve the local agent harness configuration for reliability, cost, and throughput.",
-      "mode": "subagent",
-      "model": "github-copilot/claude-sonnet-4.6",
-      "prompt": "{file:prompts/agents/harness-optimizer.txt}",
-      "tools": {
-        "read": true,
-        "bash": true,
-        "edit": true
-      }
-    },
     "java-reviewer": {
       "description": "Expert Java and Spring Boot code reviewer specializing in layered architecture, JPA patterns, security, and concurrency.",
       "mode": "subagent",
@@ -285,17 +218,6 @@
         "bash": true
       }
     },
-    "loop-operator": {
-      "description": "Operate autonomous agent loops, monitor progress, and intervene safely when loops stall.",
-      "mode": "subagent",
-      "model": "github-copilot/claude-sonnet-4.6",
-      "prompt": "{file:prompts/agents/loop-operator.txt}",
-      "tools": {
-        "read": true,
-        "bash": true,
-        "edit": true
-      }
-    },
     "python-reviewer": {
       "description": "Expert Python code reviewer specializing in PEP 8 compliance, Pythonic idioms, type hints, security, and performance.",
       "mode": "subagent",
@@ -334,18 +256,6 @@
     }
   },
   "command": {
-    "plan": {
-      "description": "Create a detailed implementation plan for complex features",
-      "template": "{file:commands/plan.md}\n\n$ARGUMENTS",
-      "agent": "planner",
-      "subtask": true
-    },
-    "tdd": {
-      "description": "Enforce TDD workflow with 80%+ test coverage",
-      "template": "{file:commands/tdd.md}\n\n$ARGUMENTS",
-      "agent": "tdd-guide",
-      "subtask": true
-    },
     "code-review": {
       "description": "Review code for quality, security, and maintainability",
       "template": "{file:commands/code-review.md}\n\n$ARGUMENTS",
@@ -376,16 +286,6 @@
       "agent": "refactor-cleaner",
       "subtask": true
     },
-    "orchestrate": {
-      "description": "Orchestrate multiple agents for complex tasks",
-      "template": "{file:commands/orchestrate.md}\n\n$ARGUMENTS",
-      "agent": "planner",
-      "subtask": true
-    },
-    "learn": {
-      "description": "Extract patterns and learnings from session",
-      "template": "{file:commands/learn.md}\n\n$ARGUMENTS"
-    },
     "checkpoint": {
       "description": "Save verification state and progress",
       "template": "{file:commands/checkpoint.md}\n\n$ARGUMENTS"
@@ -394,42 +294,10 @@
       "description": "Run verification loop",
       "template": "{file:commands/verify.md}\n\n$ARGUMENTS"
     },
-    "eval": {
-      "description": "Run evaluation against criteria",
-      "template": "{file:commands/eval.md}\n\n$ARGUMENTS"
-    },
-    "update-docs": {
-      "description": "Update documentation",
-      "template": "{file:commands/update-docs.md}\n\n$ARGUMENTS",
-      "agent": "doc-updater",
-      "subtask": true
-    },
-    "update-codemaps": {
-      "description": "Update codemaps",
-      "template": "{file:commands/update-codemaps.md}\n\n$ARGUMENTS",
-      "agent": "doc-updater",
-      "subtask": true
-    },
-    "test-coverage": {
-      "description": "Analyze test coverage",
-      "template": "{file:commands/test-coverage.md}\n\n$ARGUMENTS",
-      "agent": "tdd-guide",
-      "subtask": true
-    },
-    "setup-pm": {
-      "description": "Configure package manager",
-      "template": "{file:commands/setup-pm.md}\n\n$ARGUMENTS"
-    },
     "go-review": {
       "description": "Go code review",
       "template": "{file:commands/go-review.md}\n\n$ARGUMENTS",
       "agent": "go-reviewer",
-      "subtask": true
-    },
-    "go-test": {
-      "description": "Go TDD workflow",
-      "template": "{file:commands/go-test.md}\n\n$ARGUMENTS",
-      "agent": "tdd-guide",
       "subtask": true
     },
     "go-build": {
@@ -438,34 +306,6 @@
       "agent": "go-build-resolver",
       "subtask": true
     },
-    "skill-create": {
-      "description": "Generate skills from git history",
-      "template": "{file:commands/skill-create.md}\n\n$ARGUMENTS"
-    },
-    "instinct-status": {
-      "description": "View learned instincts",
-      "template": "{file:commands/instinct-status.md}\n\n$ARGUMENTS"
-    },
-    "instinct-import": {
-      "description": "Import instincts",
-      "template": "{file:commands/instinct-import.md}\n\n$ARGUMENTS"
-    },
-    "instinct-export": {
-      "description": "Export instincts",
-      "template": "{file:commands/instinct-export.md}\n\n$ARGUMENTS"
-    },
-    "evolve": {
-      "description": "Cluster instincts into skills",
-      "template": "{file:commands/evolve.md}\n\n$ARGUMENTS"
-    },
-    "promote": {
-      "description": "Promote project instincts to global scope",
-      "template": "{file:commands/promote.md}\n\n$ARGUMENTS"
-    },
-    "projects": {
-      "description": "List known projects and instinct stats",
-      "template": "{file:commands/projects.md}\n\n$ARGUMENTS"
-    }
   },
   "permission": {
     "mcp_*": "ask"

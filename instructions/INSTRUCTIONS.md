@@ -194,15 +194,11 @@ When creating PRs:
 
 | Agent | Purpose | When to Use |
 |-------|---------|-------------|
-| planner | Implementation planning | Complex features, refactoring |
-| architect | System design | Architectural decisions |
-| tdd-guide | Test-driven development | New features, bug fixes |
 | code-reviewer | Code review | After writing code |
 | security-reviewer | Security analysis | Before commits |
 | build-error-resolver | Fix build errors | When build fails |
 | e2e-runner | E2E testing | Critical user flows |
 | refactor-cleaner | Dead code cleanup | Code maintenance |
-| doc-updater | Documentation | Updating docs |
 | go-reviewer | Go code review | Go projects |
 | go-build-resolver | Go build errors | Go build failures |
 | database-reviewer | Database optimization | SQL, schema design |
@@ -316,14 +312,11 @@ Since OpenCode does not support hooks, the following actions that were automated
 ### Commands Available
 
 Use these commands in OpenCode:
-- `/plan` - Create implementation plan
-- `/tdd` - Enforce TDD workflow
 - `/code-review` - Review code changes
 - `/security` - Run security review
 - `/build-fix` - Fix build errors
 - `/e2e` - Generate E2E tests
 - `/refactor-clean` - Remove dead code
-- `/orchestrate` - Multi-agent workflow
 
 ---
 
