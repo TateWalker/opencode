@@ -20,7 +20,6 @@
     "instructions/openspec-superpowers.md"
   ],
   "plugin": [
-    "./plugins",
     "./plugins/caveman/plugin.js",
     "superpowers@git+https://github.com/obra/superpowers.git"
   ],
@@ -305,7 +304,7 @@
       "template": "{file:commands/go-build.md}\n\n$ARGUMENTS",
       "agent": "go-build-resolver",
       "subtask": true
-    },
+    }
   },
   "permission": {
     "mcp_*": "ask"

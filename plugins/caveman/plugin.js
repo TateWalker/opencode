@@ -204,11 +204,18 @@ export const CavemanPlugin = async (_ctx) => {
   // output.parts is the array of message parts; text parts carry .text.
   // Return value is ignored — state changes happen via the flag file.
   'chat.message': async (_input, output) => {
-    if (!output || !output.parts) return;
-    for (const part of output.parts) {
-      if (part && part.type === 'text' && part.text) {
-        const change = parseModeChange(part.text);
-        if (change) applyModeChange(change);
+    try {
+      if (!output || !output.parts) return;
+      for (const part of output.parts) {
+        if (part && part.type === 'text' && part.text) {
+          const change = parseModeChange(part.text);
+          if (change) applyModeChange(change);
+        }
+      }
+    } catch (e) {
+      // Never let a parse/flag error block message delivery.
+      if (process.env.CAVEMAN_DEBUG === '1') {
+        process.stderr.write('[caveman] chat.message hook error: ' + (e && e.stack || e) + '\n');
       }
     }
   },
@@ -217,10 +224,16 @@ export const CavemanPlugin = async (_ctx) => {
   // active. opencode calls this before every LLM request and expects the hook
   // to mutate output.system (a string[]); the return value is discarded.
   'experimental.chat.system.transform': async (_input, output) => {
-    if (!output || !Array.isArray(output.system)) return;
-    const active = readFlag(flagPath);
-    if (active && !INDEPENDENT_MODES.has(active)) {
-      output.system.push(reinforcementLine(active));
+    try {
+      if (!output || !Array.isArray(output.system)) return;
+      const active = readFlag(flagPath);
+      if (active && !INDEPENDENT_MODES.has(active)) {
+        output.system.push(reinforcementLine(active));
+      }
+    } catch (e) {
+      if (process.env.CAVEMAN_DEBUG === '1') {
+        process.stderr.write('[caveman] system.transform hook error: ' + (e && e.stack || e) + '\n');
+      }
     }
   },
   };
