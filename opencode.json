@@ -34,6 +34,12 @@
         "bash": true,
         "read": true,
         "changed-files": true
+      },
+      "permission": {
+        "bash": {
+          "tea *": "allow",
+          "git *": "allow"
+        }
       }
     },
     "plan": {
