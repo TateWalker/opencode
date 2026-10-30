@@ -4,5 +4,11 @@
   "description": "caveman plugin for opencode — terse mode tracking + slash commands",
   "type": "module",
   "main": "plugin.js",
-  "private": true
+  "exports": {
+    ".": "./plugin.js"
+  },
+  "private": true,
+  "dependencies": {
+    "@opencode/plugin": "2.1.2"
+  }
 }

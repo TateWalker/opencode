@@ -1,12 +1,11 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "model": "github-copilot/claude-sonnet-5",
-  "small_model": "github-copilot/claude-haiku-4.5",
-  "provider": {
+  "providers": {
     "github-copilot": {
       "models": {
         "claude-sonnet-5": {
-          "options": {
+          "settings": {
             "reasoningEffort": "low"
           }
         }
@@ -16,14 +15,16 @@
   "default_agent": "build",
   "instructions": [
     "AGENTS.md",
-    "CONTRIBUTING.md",
     "instructions/openspec-superpowers.md"
   ],
-  "plugin": [
-    "./plugins/caveman/plugin.js",
+  "plugins": [
+    "./plugins/caveman",
     "superpowers@git+https://github.com/obra/superpowers.git"
   ],
-  "agent": {
+  "agents": {
+    "title": {
+      "model": "github-copilot/claude-haiku-4.5"
+    },
     "build": {
       "description": "Primary coding agent for development work",
       "mode": "primary",
@@ -35,31 +36,63 @@
         "read": true,
         "changed-files": true
       },
-      "permission": {
-        "bash": {
-          "tea *": "allow",
-          "git *": "allow"
+      "permissions": [
+        {
+          "action": "shell",
+          "resource": "tea *",
+          "effect": "allow"
+        },
+        {
+          "action": "shell",
+          "resource": "git *",
+          "effect": "allow"
         }
-      }
+      ]
     },
     "plan": {
-      "permission": {
-        "edit": "deny",
-        "bash": {
-          "*": "allow",
-          "cargo fmt*": "deny",
-          "git commit*": "deny",
-          "git push*": "deny",
-          "git add*": "deny",
-          "rm *": "deny"
+      "permissions": [
+        {
+          "action": "edit",
+          "resource": "*",
+          "effect": "deny"
+        },
+        {
+          "action": "shell",
+          "resource": "*",
+          "effect": "allow"
+        },
+        {
+          "action": "shell",
+          "resource": "cargo fmt*",
+          "effect": "deny"
+        },
+        {
+          "action": "shell",
+          "resource": "git commit*",
+          "effect": "deny"
+        },
+        {
+          "action": "shell",
+          "resource": "git push*",
+          "effect": "deny"
+        },
+        {
+          "action": "shell",
+          "resource": "git add*",
+          "effect": "deny"
+        },
+        {
+          "action": "shell",
+          "resource": "rm *",
+          "effect": "deny"
         }
-      }
+      ]
     },
     "code-reviewer": {
       "description": "Expert code review specialist. Reviews code for quality, security, and maintainability. Use immediately after writing or modifying code.",
       "mode": "subagent",
       "model": "github-copilot/claude-opus-5.5",
-      "prompt": "{file:prompts/agents/code-reviewer.txt}",
+      "system": "{file:prompts/agents/code-reviewer.txt}",
       "tools": {
         "read": true,
         "bash": true,
@@ -71,7 +104,7 @@
       "description": "Security vulnerability detection and remediation specialist. Use after writing code that handles user input, authentication, API endpoints, or sensitive data.",
       "mode": "subagent",
       "model": "github-copilot/claude-opus-5.5",
-      "prompt": "{file:prompts/agents/security-reviewer.txt}",
+      "system": "{file:prompts/agents/security-reviewer.txt}",
       "tools": {
         "read": true,
         "bash": true,
@@ -83,7 +116,7 @@
       "description": "Build and TypeScript error resolution specialist. Use when build fails or type errors occur. Fixes build/type errors only with minimal diffs.",
       "mode": "subagent",
       "model": "github-copilot/claude-opus-5.5",
-      "prompt": "{file:prompts/agents/build-error-resolver.txt}",
+      "system": "{file:prompts/agents/build-error-resolver.txt}",
       "tools": {
         "read": true,
         "write": true,
@@ -95,7 +128,7 @@
       "description": "End-to-end testing specialist using Playwright. Generates, maintains, and runs E2E tests for critical user flows.",
       "mode": "subagent",
       "model": "github-copilot/claude-opus-5.5",
-      "prompt": "{file:prompts/agents/e2e-runner.txt}",
+      "system": "{file:prompts/agents/e2e-runner.txt}",
       "tools": {
         "read": true,
         "write": true,
@@ -107,7 +140,7 @@
       "description": "Dead code cleanup and consolidation specialist. Use for removing unused code, duplicates, and refactoring.",
       "mode": "subagent",
       "model": "github-copilot/claude-opus-5.5",
-      "prompt": "{file:prompts/agents/refactor-cleaner.txt}",
+      "system": "{file:prompts/agents/refactor-cleaner.txt}",
       "tools": {
         "read": true,
         "write": true,
@@ -119,7 +152,7 @@
       "description": "Expert Go code reviewer specializing in idiomatic Go, concurrency patterns, error handling, and performance.",
       "mode": "subagent",
       "model": "github-copilot/claude-opus-5.5",
-      "prompt": "{file:prompts/agents/go-reviewer.txt}",
+      "system": "{file:prompts/agents/go-reviewer.txt}",
       "tools": {
         "read": true,
         "bash": true,
@@ -131,7 +164,7 @@
       "description": "Go build, vet, and compilation error resolution specialist. Fixes Go build errors with minimal changes.",
       "mode": "subagent",
       "model": "github-copilot/claude-opus-5.5",
-      "prompt": "{file:prompts/agents/go-build-resolver.txt}",
+      "system": "{file:prompts/agents/go-build-resolver.txt}",
       "tools": {
         "read": true,
         "write": true,
@@ -143,7 +176,7 @@
       "description": "PostgreSQL database specialist for query optimization, schema design, security, and performance. Incorporates Supabase best practices.",
       "mode": "subagent",
       "model": "github-copilot/claude-opus-5.5",
-      "prompt": "{file:prompts/agents/database-reviewer.txt}",
+      "system": "{file:prompts/agents/database-reviewer.txt}",
       "tools": {
         "read": true,
         "write": true,
@@ -155,7 +188,7 @@
       "description": "Expert C++ code reviewer specializing in memory safety, modern C++ idioms, concurrency, and performance. Use for all C++ code changes.",
       "mode": "subagent",
       "model": "github-copilot/claude-opus-5.5",
-      "prompt": "{file:prompts/agents/cpp-reviewer.txt}",
+      "system": "{file:prompts/agents/cpp-reviewer.txt}",
       "tools": {
         "read": true,
         "bash": true,
@@ -167,7 +200,7 @@
       "description": "C++ build, CMake, and compilation error resolution specialist. Fixes build errors, linker issues, and template errors with minimal changes.",
       "mode": "subagent",
       "model": "github-copilot/claude-opus-5.5",
-      "prompt": "{file:prompts/agents/cpp-build-resolver.txt}",
+      "system": "{file:prompts/agents/cpp-build-resolver.txt}",
       "tools": {
         "read": true,
         "write": true,
@@ -179,7 +212,7 @@
       "description": "Expert Java and Spring Boot code reviewer specializing in layered architecture, JPA patterns, security, and concurrency.",
       "mode": "subagent",
       "model": "github-copilot/claude-opus-5.5",
-      "prompt": "{file:prompts/agents/java-reviewer.txt}",
+      "system": "{file:prompts/agents/java-reviewer.txt}",
       "tools": {
         "read": true,
         "bash": true,
@@ -191,7 +224,7 @@
       "description": "Java/Maven/Gradle build, compilation, and dependency error resolution specialist. Fixes build errors with minimal changes.",
       "mode": "subagent",
       "model": "github-copilot/claude-opus-5.5",
-      "prompt": "{file:prompts/agents/java-build-resolver.txt}",
+      "system": "{file:prompts/agents/java-build-resolver.txt}",
       "tools": {
         "read": true,
         "write": true,
@@ -203,7 +236,7 @@
       "description": "Kotlin and Android/KMP code reviewer. Reviews Kotlin code for idiomatic patterns, coroutine safety, Compose best practices.",
       "mode": "subagent",
       "model": "github-copilot/claude-opus-5.5",
-      "prompt": "{file:prompts/agents/kotlin-reviewer.txt}",
+      "system": "{file:prompts/agents/kotlin-reviewer.txt}",
       "tools": {
         "read": true,
         "bash": true,
@@ -215,7 +248,7 @@
       "description": "Kotlin/Gradle build, compilation, and dependency error resolution specialist. Fixes Kotlin build errors with minimal changes.",
       "mode": "subagent",
       "model": "github-copilot/claude-opus-5.5",
-      "prompt": "{file:prompts/agents/kotlin-build-resolver.txt}",
+      "system": "{file:prompts/agents/kotlin-build-resolver.txt}",
       "tools": {
         "read": true,
         "write": true,
@@ -227,7 +260,7 @@
       "description": "Expert Python code reviewer specializing in PEP 8 compliance, Pythonic idioms, type hints, security, and performance.",
       "mode": "subagent",
       "model": "github-copilot/claude-opus-5.5",
-      "prompt": "{file:prompts/agents/python-reviewer.txt}",
+      "system": "{file:prompts/agents/python-reviewer.txt}",
       "tools": {
         "read": true,
         "bash": true,
@@ -239,7 +272,7 @@
       "description": "Expert Rust code reviewer specializing in idiomatic Rust, ownership, lifetimes, concurrency, and performance.",
       "mode": "subagent",
       "model": "github-copilot/claude-opus-5.5",
-      "prompt": "{file:prompts/agents/rust-reviewer.txt}",
+      "system": "{file:prompts/agents/rust-reviewer.txt}",
       "tools": {
         "read": true,
         "bash": true,
@@ -251,7 +284,7 @@
       "description": "Rust build, Cargo, and compilation error resolution specialist. Fixes Rust build errors with minimal changes.",
       "mode": "subagent",
       "model": "github-copilot/claude-opus-5.5",
-      "prompt": "{file:prompts/agents/rust-build-resolver.txt}",
+      "system": "{file:prompts/agents/rust-build-resolver.txt}",
       "tools": {
         "read": true,
         "write": true,
@@ -260,7 +293,11 @@
       }
     }
   },
-  "permission": {
-    "mcp_*": "ask"
-  }
+  "permissions": [
+    {
+      "action": "mcp_*",
+      "resource": "*",
+      "effect": "ask"
+    }
+  ]
 }
